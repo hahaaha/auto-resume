@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>auto resume</title>
+    <style id="mystyle"></style>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #code {
+            overflow: auto;
+        }
+
+        @keyframes breath {
+
+            0%,
+            100% {
+                box-shadow: 0 0 4px 3px rgba(26, 255, 179, 0), 0 0 0px 0px #333, 0 0 0px 0px rgba(26, 255, 179, 0);
+            }
+
+            25% {
+                box-shadow: 0 0 4px 3px #00ff10, 0 0 6px 5px rgba(0, 255, 27, .3), 0 0 6px 7px #00ff23;
+            }
+
+            50% {
+                box-shadow: 0 0 4px 3px rgba(26, 255, 179, 0), 0 0 0px 0px #333, 0 0 0px 0px rgba(26, 255, 179, 0);
+            }
+
+            75% {
+                box-shadow: 0 0 4px 3px #00ff10, 0 0 6px 5px #333, 0 0 6px 7px #00ff23;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box">
+        <pre id="code"></pre>
+    </div>
+</body>
+
+</html>
