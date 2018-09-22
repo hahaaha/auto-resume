@@ -1,23 +1,24 @@
 import Prism from 'prismjs'
+import 'prismjs/components/prism-markdown.js'
 import Mark from 'marked'
 
-let res = `/*你好，我是不远，一名前端工程师。
-请允许我做一个简单的自我介绍，但是文字太单调，所以我想来点特别的。
+let cssCode = `
+/*你好，我是不远，一名前端工程师。
+请允许我做一个简单的自我介绍，但是纯文字太单调，所以我想来点特别的。
 首先我准备一下样式。*/
 *{
-    transition: all 1s;
+	transition: all .5s;
 }
-/* 调整下背景*/
+/*白色伤眼睛，来点暗色系的背景吧！*/
 html{
-    background:#363636;
-    color:#fff;
-    font-size:16px;
+	background: #333034;
 }
-/* 添加边框 */
-#code {
+/*让我们给它加一个边框吧*/
+#code{
     border: 2px solid #00FF1B;
     padding: 20px;
 }
+/*代码看不清楚？来点高亮吧！*/
 .token.selector{
     color: #a6e22e;
 }
@@ -27,6 +28,13 @@ html{
 .token.punctuation{
     color: #f8f8f2;
 }
+.token.function{
+    color: red;
+}
+#code{
+    color: #f8f8f2;
+}
+/*来点动画吧*/
 #code{
     animation: breath 4s linear infinite;
 }
@@ -34,11 +42,6 @@ html{
 /*首先我需要一张纸*/
 `
 var htmlCode = `
-#paper{
-    width:200px;
-    height:400px;
-    background:#F1E2C3;
-}
 #code{
     display: inline-block;
     position: fixed;
@@ -108,44 +111,21 @@ var markdown = `
 - 简书：https://www.jianshu.com/u/5362a3ed6b43
 - 掘金：https://juejin.im/user/5b9d2782e51d450e4006a485/posts
 `
-    var changeCode = window.changeCode = `
+var changeCode = `
 /*这样看起来很不舒服？让我们把markdown转换成更易读的显示方式吧*/
 `
-    var conclusion = window.conclusion = `
+var conclusion = `
 /*好了，这个就是我的简历了。如果您对我还算满意或者想要更多了解的话，请联系我哦*/
 `
-let fn2 = () => {
-    let paper = document.createElement('pre')
-    paper.id = 'paper'
-    document.getElementById('box').appendChild(paper)
-}
-
-let fn3 = (preResult) => {
-    let res = `
-#paper{
-    width:200px;
-    height:400px;
-    background:#F1E2C3;
-}`
-
-    let n = 0
+let createPaper = () => {
     let p = new Promise((resolve) => {
-        let domCode = document.getElementById('code')
-        let clock = setInterval(() => {
-            n += 1
-            domCode.innerHTML = preResult + res.substring(0, n)
-            domCode.innerHTML = Prism.highlight(code.innerHTML, Prism.languages.css)
-            mystyle.innerHTML = preResult + res.substring(0, n)
-            
-            if (n >= res.length) {
-                window.clearInterval(clock)
-                resolve(mystyle.innerHTML)
-            }
-        }, 10)
+        let paper = document.createElement('pre')
+        paper.id = 'paper'
+        document.getElementById('box').appendChild(paper)
+        resolve()
     })
 
     return p
-    
 }
 
 var writeCode = (prefix, code) => {
@@ -156,7 +136,11 @@ var writeCode = (prefix, code) => {
             n++
             domCode.innerHTML = Prism.highlight(prefix + code.substring(0, n), Prism.languages.css)
             mystyle.innerHTML = prefix + code.substring(0, n)
-            domCode.scrollIntoView({behavior: "instant", block: "end", inline: "nearest"})
+            domCode.scrollIntoView({
+                behavior: "instant",
+                block: "end",
+                inline: "nearest"
+            })
             if (n > code.length) {
                 window.clearInterval(clock)
                 resolve('one')
@@ -169,24 +153,41 @@ var writeCode = (prefix, code) => {
 
 function writeMarkdown(markdown) {
     let domPaper = document.getElementById('paper')
-    console.log(domPaper)
-    let n = 0
-    var clock = setInterval(() => {
-        n += 1
-        domPaper.innerHTML = Prism.highlight(markdown.substring(0, n),Prism.languages.css)
-        // domPaper.scrollIntoView({behavior: "instant", block: "end", inline: "nearest"})
-        if (n >= markdown.length) {
-            window.clearInterval(clock)
-        }
-    }, 10)
+    let p = new Promise((resolve) => {
+        let n = 0
+        var clock = setInterval(() => {
+            n += 1
+            domPaper.innerHTML = Prism.highlight(markdown.substring(0, n), Prism.languages.markdown)
+            // domPaper.scrollIntoView({behavior: "instant", block: "end", inline: "nearest"})
+            if (n >= markdown.length) {
+                window.clearInterval(clock)
+                resolve(markdown)
+            }
+        }, 10)
+    })
+
+    return p
+
 }
 
-writeCode('', res).then(() => {
-    fn2()
-    return fn3(res)
-}).then((data) => {
-    console.log('HI')
-    writeCode(data,htmlCode)
-}).then(() => {
-    writeMarkdown(markdown)
-})
+function convertMarkdownToHtml(markdown) {
+    let p = new Promise((resolve) => {
+        document.querySelector('#paper').innerHTML = Mark(markdown)
+        resolve()    
+    })
+}
+
+writeCode('', cssCode)
+    .then(() => {
+        return createPaper()
+    }).then(() => {
+        return writeCode(cssCode, htmlCode)
+    }).then(() => {
+        return writeCode(cssCode+htmlCode,changeCode)
+    }).then(() => {
+        return writeMarkdown(markdown)
+    }).then((markdown) => {
+        return convertMarkdownToHtml(markdown)
+    }).then(() => {
+        return writeCode(cssCode + htmlCode + changeCode,conclusion)
+    })
